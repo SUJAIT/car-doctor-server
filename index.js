@@ -35,7 +35,7 @@ async function run() {
 app.post('/jwt',(req,res)=>{
   const user = req.body;
   console.log(user);
-  const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '1h'});
+  const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '1h'}); 
   // console.log({token});
   res.send({token});
 })
@@ -48,7 +48,7 @@ const verifyJWT = (req,res,next)=>{
   if(!authorization){
    return res.status(401).send({error:true,message:'unauthorized access'})
   }
-  const token = authorization.split(' ')[1];
+  const token = authorization.split(' ')[1]; //ai line ta hole token ar last ar {signature} part ta nisa .
   jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(error,decoded)=>{
     if(error){
       return res.status(403).send({error: true,message:'unauthorized access'})
@@ -99,16 +99,18 @@ app.post('/bookings',async(req,res)=>{
 //booking End
 // DB BookingData pick
 app.get('/bookings',verifyJWT,async(req,res)=>{
-  const decoded = req.decoded;
-  console.log(decoded)
+
   console.log(req.query.email);
 
   //jwt
-if(decoded.email !== req.query.email){
+    const decoded = req.decoded;
+  console.log(decoded)
+if(decoded.email !== req.query.email) // user email and Req Email Same Kina Ta check Korba
+{
   return res.status(403).send({error:1,message:'forbidden access'})
 }
 
-  //jwt end
+//jwt end
 
 
   let query = {};
