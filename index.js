@@ -34,7 +34,7 @@ async function run() {
 //JWT Working Start
 app.post('/jwt',(req,res)=>{
   const user = req.body;
-  console.log(user);
+  // console.log(user);
   const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '1h'}); 
   // console.log({token});
   res.send({token});
@@ -69,7 +69,21 @@ const bookingCollection = client.db('carservices').collection('bookings')
 //Find {Document DB Data} start
   //DB Data Read Start
     app.get('/services',async(req,res)=>{
-    const cursor = serviceCollection.find();
+      //High to lower : lower to higher start : and check {price Numbering} Product
+    const sort = req.query.sort;  
+    const search = req.query.search;
+    console.log(search);
+    const query = {title: {$regex:search,$options:'i'}};
+    // i dara casesensitive ta hota dai na..
+        const options = {
+      sort: { 
+        "price": sort === 'asc' ? 1 : -1 
+        // akna 1 dara higer and -1 dara lower bujanu hoisa...
+      }
+    };  
+
+    const cursor = serviceCollection.find(query,options);
+        //High to lower : lower to higher end...
     const result = await cursor.toArray();
     res.send(result)
 })
@@ -121,7 +135,7 @@ if(decoded.email !== req.query.email) // user email and Req Email Same Kina Ta c
   const result = await bookingCollection.find(query).toArray();
   res.send(result);
 })
-
+// DB BookingData pick end
 
 //DB Booking Data Delete start
 app.delete('/bookings/:id',async(req,res)=>{
@@ -163,7 +177,7 @@ run().catch(console.dir);
 
 
 app.get('/',(req,res)=>{
- res.send('ai bata')
+ res.send('Server is Canected')
 });
 
 
